@@ -158,6 +158,6 @@ public class Dispatcher extends Stopable {
 		}
 
 		Logger.log("onPublish:" + msg.toString());
-		//ferdig
+		//slettet kommentar
 	}
 }
