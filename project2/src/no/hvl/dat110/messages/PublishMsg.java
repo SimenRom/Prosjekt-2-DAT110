@@ -6,7 +6,9 @@ public class PublishMsg extends Message {
 	// Implement objectvariables, constructor, get/set-methods, and toString method
 	
 	String message;
-	public PublishMsg(String message, String usr) {
+	String topic;
+	
+	public PublishMsg(String message, String usr, String topic) {
 		super(MessageType.PUBLISH, usr);
 		this.message = message;
 	}
@@ -15,6 +17,10 @@ public class PublishMsg extends Message {
 	}
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	
+	public String getTopic(){
+		return topic;
 	}
 	@Override
 	public String toString() {

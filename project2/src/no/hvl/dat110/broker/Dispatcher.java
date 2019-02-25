@@ -92,7 +92,7 @@ public class Dispatcher extends Stopable {
 
 	}
 
-	// called by dispatch upon receiving a disconnect message 
+	// called by dispatch upon receiving a disconnect message
 	public void onDisconnect(DisconnectMsg msg) {
 
 		String user = msg.getUser();
@@ -103,52 +103,61 @@ public class Dispatcher extends Stopable {
 
 	}
 
+	// create the topic in the broker storage
 	public void onCreateTopic(CreateTopicMsg msg) {
+		String topic = msg.getTopic();
+		
+		storage.createTopic(topic);
 
 		Logger.log("onCreateTopic:" + msg.toString());
-
-		// TODO: create the topic in the broker storage 
-		
-		throw new RuntimeException("not yet implemented");
-
 	}
 
+	// delete the topic from the broker storage
 	public void onDeleteTopic(DeleteTopicMsg msg) {
-
+		String topic = msg.getTopic();
+		
+		storage.deleteTopic(topic);
+		
 		Logger.log("onDeleteTopic:" + msg.toString());
 
-		// TODO: delete the topic from the broker storage
-		
-		throw new RuntimeException("not yet implemented");
 	}
 
+	// subscribe user to the topic
 	public void onSubscribe(SubscribeMsg msg) {
+		String user = msg.getUser();
+		String topic = msg.getTopic();
+		
+		storage.addSubscriber(user, topic);
 
 		Logger.log("onSubscribe:" + msg.toString());
 
-		// TODO: subscribe user to the topic
-		
-		throw new RuntimeException("not yet implemented");
-		
 	}
 
+	// unsubscribe user to the topic
 	public void onUnsubscribe(UnsubscribeMsg msg) {
-
+		String user = msg.getUser();
+		String topic = msg.getTopic();
+		
+		storage.removeSubscriber(user, topic);
+		
 		Logger.log("onUnsubscribe:" + msg.toString());
 
-		// TODO: unsubscribe user to the topic
-		
-		throw new RuntimeException("not yet implemented");
-
 	}
-
+	
+	// publish the message to clients subscribed to the topic
 	public void onPublish(PublishMsg msg) {
+		String topic = msg.getTopic();
+		Set<String> subs = storage.getSubscribers(topic);
+		
+		Collection<ClientSession> clients = storage.getSessions();
+		
+		for(ClientSession cs : clients) {
+			if(subs.contains(cs.getUser())) {
+				cs.send(msg);
+			}
+		}
 
 		Logger.log("onPublish:" + msg.toString());
 
-		// TODO: publish the message to clients subscribed to the topic
-		
-		throw new RuntimeException("not yet implemented");
-		
 	}
 }
