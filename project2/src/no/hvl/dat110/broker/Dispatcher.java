@@ -147,8 +147,8 @@ public class Dispatcher extends Stopable {
 	// publish the message to clients subscribed to the topic
 	public void onPublish(PublishMsg msg) {
 		String topic = msg.getTopic();
+		System.out.println("Topic: "+ topic);
 		Set<String> subs = storage.getSubscribers(topic);
-		
 		Collection<ClientSession> clients = storage.getSessions();
 		
 		for(ClientSession cs : clients) {
@@ -158,6 +158,6 @@ public class Dispatcher extends Stopable {
 		}
 
 		Logger.log("onPublish:" + msg.toString());
-		//ferdig
+
 	}
 }

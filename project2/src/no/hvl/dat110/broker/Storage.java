@@ -36,7 +36,8 @@ public class Storage {
 	}
 
 	public Set<String> getSubscribers(String topic) {
-		return (subscriptions.get(topic));
+		Set<String> midl = subscriptions.get(topic);
+		return midl;
 
 	}
 
