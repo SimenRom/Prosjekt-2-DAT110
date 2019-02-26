@@ -158,6 +158,5 @@ public class Dispatcher extends Stopable {
 		}
 
 		Logger.log("onPublish:" + msg.toString());
-
 	}
 }
