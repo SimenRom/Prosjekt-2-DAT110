@@ -60,11 +60,11 @@ public class Storage {
 		
 	}
 
-	public void addSubscriber(String user, String topic) {
+	public void addSubscriber(String topic, String user) {
 		subscriptions.get(topic).add(user);
 	}
 
-	public void removeSubscriber(String user, String topic) {
+	public void removeSubscriber(String topic, String user) {
 		subscriptions.get(topic).remove(user);
 	}
 }
