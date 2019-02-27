@@ -8,9 +8,10 @@ public class PublishMsg extends Message {
 	String message;
 	String topic;
 	
-	public PublishMsg(String message, String usr, String topic) {
+	public PublishMsg(String usr, String topic, String message) {
 		super(MessageType.PUBLISH, usr);
 		this.message = message;
+		this.topic = topic;
 	}
 	public String getMessage() {
 		return message;
