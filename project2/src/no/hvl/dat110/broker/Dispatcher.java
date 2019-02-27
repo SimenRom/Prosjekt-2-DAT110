@@ -1,7 +1,10 @@
 package no.hvl.dat110.broker;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import no.hvl.dat110.common.Logger;
 import no.hvl.dat110.common.Stopable;
@@ -11,11 +14,9 @@ import no.hvl.dat110.messagetransport.Connection;
 public class Dispatcher extends Stopable {
 
 	private Storage storage;
-
 	public Dispatcher(Storage storage) {
 		super("Dispatcher");
 		this.storage = storage;
-
 	}
 
 	@Override
@@ -89,7 +90,12 @@ public class Dispatcher extends Stopable {
 		Logger.log("onConnect:" + msg.toString());
 
 		storage.addClientSession(user, connection);
-
+		
+		//sends messages from offline-buffer
+		ClientSession cs = storage.clients.get(user);
+		for(Message m : storage.offlineMessageBuffer.get(user)) {
+			cs.send(m);
+		}
 	}
 
 	// called by dispatch upon receiving a disconnect message
@@ -98,9 +104,9 @@ public class Dispatcher extends Stopable {
 		String user = msg.getUser();
 
 		Logger.log("onDisconnect:" + msg.toString());
-
+		storage.offlineMessageBuffer.put(user, new ArrayList<Message>());
 		storage.removeClientSession(user);
-
+		
 	}
 
 	// create the topic in the broker storage
@@ -155,7 +161,13 @@ public class Dispatcher extends Stopable {
 				cs.send(msg);
 			}
 		}
-
+		
+		//Add messages to buffer for offline users.
+		for(String offUser : storage.offlineMessageBuffer.keySet()) {
+			if(subs.contains(offUser)) {
+				storage.offlineMessageBuffer.get(offUser).add(msg);
+			}
+		}
 		Logger.log("onPublish:" + msg.toString());
 	}
 }
