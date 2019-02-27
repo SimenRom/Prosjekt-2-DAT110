@@ -147,16 +147,10 @@ public class Dispatcher extends Stopable {
 	// publish the message to clients subscribed to the topic
 	public void onPublish(PublishMsg msg) {
 		String topic = msg.getTopic();
-		System.out.println("Topic: "+ topic);
-//		Set<String> subs = storage.getSubscribers(topic);
-		System.out.println("Antall subs i testtopic:" + storage.subscriptions.get("testtopic").isEmpty());
 		Set<String> subs = storage.subscriptions.get(topic);
-		System.out.println("Antall subs:" + subs.size());
 		Collection<ClientSession> clients = storage.getSessions();
-		System.out.println("Antall clients: " + clients.size());
 		for(ClientSession cs : clients) {
 			String user = cs.getUser();
-			System.out.println("ClientSession user:" + user);
 			if(subs.contains(user)) {
 				cs.send(msg);
 			}

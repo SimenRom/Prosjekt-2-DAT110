@@ -6,7 +6,7 @@ public class DeleteTopicMsg extends Message {
 	// Implement objectvariables, constructor, get/set-methods, and toString method
 	String topic;
 	
-	public DeleteTopicMsg(String topic, String usr) {
+	public DeleteTopicMsg(String usr, String topic) {
 		super(MessageType.DELETETOPIC, usr);
 		this.topic = topic;
 	}
