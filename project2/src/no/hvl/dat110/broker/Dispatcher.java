@@ -14,6 +14,7 @@ import no.hvl.dat110.messagetransport.Connection;
 public class Dispatcher extends Stopable {
 
 	private Storage storage;
+
 	public Dispatcher(Storage storage) {
 		super("Dispatcher");
 		this.storage = storage;
@@ -90,11 +91,13 @@ public class Dispatcher extends Stopable {
 		Logger.log("onConnect:" + msg.toString());
 
 		storage.addClientSession(user, connection);
-		
-		//sends messages from offline-buffer
+
+		// sends messages from offline-buffer
 		ClientSession cs = storage.clients.get(user);
-		for(Message m : storage.offlineMessageBuffer.get(user)) {
-			cs.send(m);
+		if (storage.offlineMessageBuffer.get(user) != null) {
+			for (Message m : storage.offlineMessageBuffer.get(user)) {
+				cs.send(m);
+			}
 		}
 	}
 
@@ -106,13 +109,13 @@ public class Dispatcher extends Stopable {
 		Logger.log("onDisconnect:" + msg.toString());
 		storage.offlineMessageBuffer.put(user, new ArrayList<Message>());
 		storage.removeClientSession(user);
-		
+
 	}
 
 	// create the topic in the broker storage
 	public void onCreateTopic(CreateTopicMsg msg) {
 		String topic = msg.getTopic();
-		
+
 		storage.createTopic(topic);
 
 		Logger.log("onCreateTopic:" + msg.toString());
@@ -121,9 +124,9 @@ public class Dispatcher extends Stopable {
 	// delete the topic from the broker storage
 	public void onDeleteTopic(DeleteTopicMsg msg) {
 		String topic = msg.getTopic();
-		
+
 		storage.deleteTopic(topic);
-		
+
 		Logger.log("onDeleteTopic:" + msg.toString());
 
 	}
@@ -132,7 +135,7 @@ public class Dispatcher extends Stopable {
 	public void onSubscribe(SubscribeMsg msg) {
 		String user = msg.getUser();
 		String topic = msg.getTopic();
-		
+
 		storage.addSubscriber(user, topic);
 
 		Logger.log("onSubscribe:" + msg.toString());
@@ -143,28 +146,28 @@ public class Dispatcher extends Stopable {
 	public void onUnsubscribe(UnsubscribeMsg msg) {
 		String user = msg.getUser();
 		String topic = msg.getTopic();
-		
+
 		storage.removeSubscriber(user, topic);
-		
+
 		Logger.log("onUnsubscribe:" + msg.toString());
 
 	}
-	
+
 	// publish the message to clients subscribed to the topic
 	public void onPublish(PublishMsg msg) {
 		String topic = msg.getTopic();
 		Set<String> subs = storage.subscriptions.get(topic);
 		Collection<ClientSession> clients = storage.getSessions();
-		for(ClientSession cs : clients) {
+		for (ClientSession cs : clients) {
 			String user = cs.getUser();
-			if(subs.contains(user)) {
+			if (subs.contains(user)) {
 				cs.send(msg);
 			}
 		}
-		
-		//Add messages to buffer for offline users.
-		for(String offUser : storage.offlineMessageBuffer.keySet()) {
-			if(subs.contains(offUser)) {
+
+		// Add messages to buffer for offline users.
+		for (String offUser : storage.offlineMessageBuffer.keySet()) {
+			if (subs.contains(offUser)) {
 				storage.offlineMessageBuffer.get(offUser).add(msg);
 			}
 		}
